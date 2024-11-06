@@ -22,7 +22,7 @@ export default async function createApp(options = {}, dataFilePath: PathLike) {
     { schema: postPetSchema },
     async (request, reply) => {
       const { name } = request.body;
-      const newPet = petService.born(name);
+      const newPet = await petService.born(name);
 
       reply.status(201);
       return newPet;

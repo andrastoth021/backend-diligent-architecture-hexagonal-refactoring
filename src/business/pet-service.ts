@@ -22,7 +22,7 @@ export class PetService implements PetManagementPrimaryPort {
   }
 
   async born(name: string) {
-    const created = this.store.create(name);
+    const created = await this.store.create(name);
     return created;
   }
 
