@@ -1,29 +1,32 @@
-import { PetRepository } from "../data-access/pet-repository";
-import { JsonFileStore } from "../utils/json-file-store";
-import { CreatePet, Pet } from "./pet-type";
+import { Pet } from "./pet-type";
 
-export class PetService {
-  private readonly repository;
+export interface PetManagementPrimaryPort {
+  born: (name: string) => Promise<Pet>;
+  herdAll: () => Promise<Pet[]>;
+}
+
+export interface StorePetSecondaryPort {
+  create(name: string): Promise<Pet>;
+  readById(): void;
+  readAll(): Promise<Pet[]>;
+  update(): void;
+  delete(): void;
+}
 
 
-  constructor(store: JsonFileStore<Pet>) {
-    this.repository = new PetRepository(store);
+export class PetService implements PetManagementPrimaryPort {
+  private readonly store;
+
+  constructor(store: StorePetSecondaryPort) {
+    this.store = store;
   }
 
   async born(name: string) {
-    // business logic
-    const petProperties: CreatePet = {
-      name,
-      food: 1,
-      weight: 1,
-      age: 1
-    }
-    const created = this.repository.create(petProperties)
-
+    const created = this.store.create(name);
     return created;
   }
 
   async herdAll() {
-    return await this.repository.readAll();
+    return await this.store.readAll();
   }
 }
