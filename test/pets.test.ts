@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import createApp from "../src/presentational/app"
+import createApp from "../src/presentational/fastify-api-primary-adapter"
 import { join } from "node:path";
 import { PathLike, unlinkSync } from "node:fs";
 

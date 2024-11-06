@@ -6,6 +6,7 @@ import { JsonFileStore } from '../utils/json-file-store';
 import { Pet } from '../business/pet-type';
 import { PetService } from '../business/pet-service';
 import { postPetSchema } from './route-schemas';
+import { PetStoreSecondaryAdapter } from '../data-access/pet-store-secondary-adapter';
 
 export default async function createApp(options = {}, dataFilePath: PathLike) {
   const app = fastify(options).withTypeProvider<JsonSchemaToTsProvider>()
@@ -13,18 +14,16 @@ export default async function createApp(options = {}, dataFilePath: PathLike) {
 
   const petStore = new JsonFileStore<Pet>(dataFilePath);
 
+  const secondaryAdapter = new PetStoreSecondaryAdapter(petStore);
+  const petService = new PetService(secondaryAdapter);
+
   app.post(
     '/pets',
     { schema: postPetSchema },
     async (request, reply) => {
-      // get info from request
-      const { name } = request.body
-
-      // do the business logic
-      const petService = new PetService(petStore);
+      const { name } = request.body;
       const newPet = petService.born(name);
 
-      // create a HTTP response
       reply.status(201);
       return newPet;
     }
@@ -33,7 +32,6 @@ export default async function createApp(options = {}, dataFilePath: PathLike) {
   app.get(
     '/pets',
     async () => {
-      const petService = new PetService(petStore)
       const pets = await petService.herdAll();
       return pets;
     }
