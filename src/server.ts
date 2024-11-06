@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import createApp from "./presentational/app";
+import createApp from "./presentational/fastify-api-primary-adapter";
 
 const PORT = 4400;
 

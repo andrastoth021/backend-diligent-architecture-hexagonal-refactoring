@@ -1,4 +1,5 @@
-import { CreatePet, Pet } from "../business/pet-type";
+import { StorePetSecondaryPort } from "../business/pet-service";
+import { Pet } from "../business/pet-type";
 import { JsonFileStore } from "../utils/json-file-store";
 
 function getNextId<T extends { id: number }>(items: T[]) {
@@ -10,26 +11,28 @@ function getNextId<T extends { id: number }>(items: T[]) {
   return maxId + 1;
 }
 
-export class PetRepository {
+export class PetStoreSecondaryAdapter implements StorePetSecondaryPort {
   private readonly store;
 
   constructor(store: JsonFileStore<Pet>) {
     this.store = store;
   }
 
-  async create(petProperties: CreatePet) {
+  async create(name: string) {
     const pets = await this.store.read();
     const nextId = getNextId(pets);
 
-    const newPet = {
-      ...petProperties,
-      id: nextId
+    const newPet: Pet = {
+      id: nextId,
+      name,
+      food: 1,
+      weight: 1,
+      age: 1
     }
 
     pets.push(newPet);
     await this.store.write(pets);
     return newPet;
-
   }
 
   async readById() {
